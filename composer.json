@@ -1,0 +1,117 @@
+{
+    "name": "yiisoft/yii2-app-advanced",
+    "description": "Yii 2 Advanced Project Template",
+    "keywords": ["yii2", "framework", "advanced", "project template"],
+    "homepage": "http://www.yiiframework.com/",
+    "type": "project",
+    "license": "BSD-3-Clause",
+    "support": {
+        "issues": "https://github.com/yiisoft/yii2/issues?state=open",
+        "forum": "http://www.yiiframework.com/forum/",
+        "wiki": "http://www.yiiframework.com/wiki/",
+        "irc": "irc://irc.freenode.net/yii",
+        "source": "https://github.com/yiisoft/yii2"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=7.4",
+        "ext-gd": "*",
+        "ext-http": "*",
+        "ext-json": "*",
+        "ext-xmlwriter": "*",
+        "dmstr/yii2-adminlte-asset": "^2.6.2",
+        "filsh/yii2-oauth2-server": "^2.0",
+        "fishvision/yii2-migrate": "^1.0.1",
+        "guzzlehttp/guzzle": "^7.9.3",
+        "himiklab/yii2-sortable-grid-view-widget": "^1.0.11",
+        "ihor/nspl": "^1.3",
+        "insolita/yii2-adminlte-widgets": "^3.2",
+        "karriere/json-decoder": "^4.2.0",
+        "kartik-v/yii2-export": "@dev",
+        "kartik-v/yii2-field-range": "^1.3.5",
+        "kartik-v/yii2-icons": "@dev",
+        "kartik-v/yii2-widget-datepicker": "^1.4.8",
+        "kartik-v/yii2-widget-depdrop": "@dev",
+        "kartik-v/yii2-widget-select2": "^2.2.5",
+        "kmergen/yii2-language-switcher": "@dev",
+        "la-haute-societe/yii2-save-relations-behavior": "*",
+        "league/flysystem": "^1.0",
+        "loveorigami/yii2-jsoneditor": "^1.0",
+        "loveorigami/yii2-modal-ajax": "^3.8",
+        "mihaildev/yii2-ckeditor": "@dev",
+        "nette/php-generator": "^v3.6.9",
+        "npm-asset/jointjs": "^3.7",
+        "omgdef/yii2-multilingual-behavior": "^2.1.2",
+        "paulzi/yii2-nested-sets": "^1.1.0",
+        "ruskid/yii2-csv-importer": "^1.0.0",
+        "symfony/yaml": "^3.3",
+        "unclead/yii2-multiple-input": "^2.30.0",
+        "vlucas/phpdotenv": "^5.6.1",
+        "yii-dream-team/yii2-upload-behavior": "^1.2.3",
+        "yii-ui/yii2-flag-icon-css-asset-bundle": "*",
+        "yii2mod/yii2-editable": "^1.5",
+        "yiimaker/yii2-social-share": "^2.3.4",
+        "yiisoft/yii2": "=2.0.42",
+        "yiisoft/yii2-authclient": "~2.2.0",
+        "yiisoft/yii2-bootstrap": "~2.0.0",
+        "yiisoft/yii2-bootstrap5": "~2.0.4@dev",
+        "yiisoft/yii2-imagine": "^2.3.1",
+        "yiisoft/yii2-jui": "~2.0.0",
+        "yiisoft/yii2-queue": "2.3.2",
+        "yiisoft/yii2-redis": "2.0.16",
+        "yiisoft/yii2-swiftmailer": "~2.0.0 || ~2.1.0"
+    },
+    "require-dev": {
+        "battye/php-array-parser": "^1.0.10",
+        "insolita/yii2-migration-generator": "^3.2",
+        "league/climate": "^3.10.0",
+        "phpdocumentor/reflection-docblock": "^5.3.0",
+        "sixlive/dotenv-editor": "^v1.3.0",
+        "symfony/browser-kit": ">=2.7 <=4.2.4",
+        "symfony/console": "~2.8",
+        "symfony/process": "~3.4",
+        "yiisoft/yii2-debug": "~2.1.0",
+        "yiisoft/yii2-faker": "~2.0.0",
+        "yiisoft/yii2-gii": "~2.1.0"
+    },
+    "config": {
+        "sort-packages" : true,
+        "process-timeout": 1800,
+        "fxp-asset": {
+            "enabled": false
+        },
+        "allow-plugins": {
+            "yiisoft/yii2-composer": true
+        }
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/monter08/PHPThumb"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/svgvozdj/yii2-bootstrap5",
+            "__comment": "change bower-asset/bootstrap to npm-asset/bootstrap"
+        }
+    ],
+    "scripts": {
+        "setup": [
+            "yii config/setup",
+            "yii config/storm",
+            "yii config/database",
+            "yii config/migrate",
+            "yii config/git",
+            "yii config/cute"
+        ],
+        "post-install-cmd": [
+            "powershell -Command \"if (Test-Path '.osp/project.ini') { (Get-Content '.osp/project.ini') -replace 'sv5kit[.]open', (Split-Path $PWD -Leaf) | Set-Content '.osp/project.ini' }\""
+        ],
+        "post-update-cmd": []
+    }
+}
