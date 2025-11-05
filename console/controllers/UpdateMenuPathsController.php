@@ -2,11 +2,8 @@
 
 namespace console\controllers;
 
-use Yii;
-use yii\base\Exception;
 use yii\console\Controller;
-use yii\helpers\BaseConsole;
-use yii\helpers\FileHelper;
+use yii\helpers\Console;
 
 /**
  * Контроллер для обновления путей в меню с учетом новой структуры файлов
@@ -22,14 +19,14 @@ class UpdateMenuPathsController extends Controller
      */
     public function actionIndex(?string $directory = ''): int
     {
-        $currentDir = Yii::getAlias('@external') . "/{$directory}";
+        $currentDir = \Yii::getAlias('@external') . "/{$directory}";
         
-        $this->stdout("Начинаю обновление путей в меню в директории: {$currentDir}\n", BaseConsole::FG_YELLOW);
+        $this->stdout("Начинаю обновление путей в меню в директории: {$currentDir}\n", Console::FG_YELLOW);
 
         $menuFile = $currentDir . '/partials/sidenav.php';
         
         if (!file_exists($menuFile)) {
-            $this->stderr("Файл меню {$menuFile} не существует\n", BaseConsole::FG_RED);
+            $this->stderr("Файл меню {$menuFile} не существует\n", Console::FG_RED);
             return 1;
         }
 
@@ -37,7 +34,7 @@ class UpdateMenuPathsController extends Controller
         $content = file_get_contents($menuFile);
         
         if ($content === false) {
-            $this->stderr("Не удалось прочитать файл меню {$menuFile}\n", BaseConsole::FG_RED);
+            $this->stderr("Не удалось прочитать файл меню {$menuFile}\n", Console::FG_RED);
             return 1;
         }
 
@@ -52,7 +49,7 @@ class UpdateMenuPathsController extends Controller
         // Уникальные имена файлов
         $uniqueFiles = array_unique($phpLinks);
         
-        $this->stdout("Найдено уникальных файлов в меню: " . count($uniqueFiles) . "\n", BaseConsole::FG_YELLOW);
+        $this->stdout("Найдено уникальных файлов в меню: " . count($uniqueFiles) . "\n", Console::FG_YELLOW);
 
         // Для каждого файла проверим, существует ли он в component
         foreach ($uniqueFiles as $filename) {
@@ -63,7 +60,7 @@ class UpdateMenuPathsController extends Controller
             // Проверим, существует ли файл в какой-либо подпапке component
             $componentDir = $currentDir . '/component';
             if (!is_dir($componentDir)) {
-                $this->stderr("Директория component не существует: {$componentDir}\n", BaseConsole::FG_RED);
+                $this->stderr("Директория component не существует: {$componentDir}\n", Console::FG_RED);
                 continue;
             }
 
@@ -83,7 +80,7 @@ class UpdateMenuPathsController extends Controller
                     $newHrefSingle = "href='component/" . $subdir . "/" . $filename . "'";
                     $content = str_replace($oldHrefSingle, $newHrefSingle, $content);
                     
-                    $this->stdout("Обновлен путь для {$filename}: component/{$subdir}/{$filename}\n", BaseConsole::FG_GREEN);
+                    $this->stdout("Обновлен путь для {$filename}: component/{$subdir}/{$filename}\n", Console::FG_GREEN);
                     break;
                 }
             }
@@ -93,11 +90,11 @@ class UpdateMenuPathsController extends Controller
         $result = file_put_contents($menuFile, $content);
         
         if ($result === false) {
-            $this->stderr("Не удалось записать файл меню {$menuFile}\n", BaseConsole::FG_RED);
+            $this->stderr("Не удалось записать файл меню {$menuFile}\n", Console::FG_RED);
             return 1;
         }
 
-        $this->stdout("Обновление путей в меню завершено.\n", BaseConsole::FG_YELLOW);
+        $this->stdout("Обновление путей в меню завершено.\n", Console::FG_YELLOW);
         return 0;
     }
 
