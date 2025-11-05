@@ -410,3 +410,200 @@ class UserServiceTest extends TestCase
         $this->assertInstanceOf(User::class, $user);
     }
 }
+```
+
+## Примеры плохого и хорошего кода
+
+### Плохой код
+
+Примеры антипаттернов, которые НЕ ДОПУСТИМЫ в проекте:
+
+1. **Отсутствие type hinting в параметрах и возвращаемых значениях** - ЗАПРЕЩЕНО
+  ```php
+  // Плохо: отсутствие type hinting у параметра
+  public function find($id) // - параметр $id должен быть int, возвращаемое значение должно быть ?Page
+  {
+      return $this->pages->find($id);
+  }
+
+  // Плохо: отсутствие type hinting у параметра
+  public function create(\core\forms\PageForm $form) // - параметр $form должен быть PageForm $form, возвращаемое значение должно быть Page
+  {
+      $page = \core\entities\Page\Page::create($form->signature_id, $form->title);
+      return $page;
+  }
+  ```
+
+2. **Использование полных путей вместо use** - ЗАПРЕЩЕНО
+  ```php
+  // Плохо: использование полного пути в @var
+  protected $pages;
+
+  // Плохо: конструктор использует полные пути
+  public function __construct(
+      \core\services\TransactionManager $transaction,
+      \core\services\language\LanguageService $language
+  ) {
+      // Плохо: создание через сервис-локатор — ЗАПРЕЩЕНО
+      $this->pages = \Yii::createObject(PageRepository::class);
+  }
+
+  // Плохо: полный путь вместо use
+  $page = \core\entities\Page\Page::create($form->signature_id, $form->title);
+  ```
+
+3. **DI через new и Yii::createObject** - ЗАПРЕЩЕНО
+  ```php
+  // Плохо: DI через createObject и new — ЗАПРЕЩЕНО
+  public function __construct() {
+      $this->pages = \Yii::createObject(PageRepository::class); // DI через createObject - ЗАПРЕЩЕНО
+      $this->signatures = new \core\repositories\signature\SignatureRepository(); // DI через new - ЗАПРЕЩЕНО
+  }
+  ```
+
+4. **Глобальный доступ к Yii::$app** - ЗАПРЕЩЕНО
+  ```php
+  // Плохо: глобальный доступ к базе данных — ЗАПРЕЩЕНО
+  $transaction = \Yii::$app->db->beginTransaction();
+
+  // Плохо: метод использует глобальное состояние
+  public function logError($message) {
+      $logger = \Yii::$app->get('logger');
+      $logger->error($message);
+  }
+  ```
+
+5. **Публичные свойства** - нарушают инкапсуляцию
+  ```php
+  // Плохо: публичное свойство
+  public $transaction;
+  ```
+
+6. **Плохие комментарии** - дублируют типы, которые можно указать в сигнатуре
+  ```php
+  // Плохо: комментарий бесполезен
+  /**
+   * @param $id — нельзя! тип должен быть в сигнатуре: find(int $id)
+   * @return \core\entities\Page\Page|null — нельзя! должно быть: ?Page
+   */
+  public function find($id)
+  ```
+
+7. **Имена методов** - нечитаемые, слишком длинные
+  ```php
+  // Плохо: имя метода нечитаемое и избыточное
+  public function badNameVeryLongMethod($withCode)
+  ```
+
+8. **Внедрение хелперов через DI** - КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО
+  ```php
+  // Плохо: попытка внедрить хелпер через DI — КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО
+  private $codeHelper;
+
+  public function __construct(CodeHelper $codeHelper) {
+      $this->codeHelper = $codeHelper;  // ← ЭТО АНТИПАТТЕРН!
+  }
+  ```
+
+### Хороший код
+
+Примеры правильного применения принципов:
+
+1. **Type hinting для параметров и возвращаемых значений** - Обязательно
+  ```php
+  // Хорошо: явное указание типов
+  public function find(int $id): ?Page
+  {
+      return $this->pages->find($id);
+  }
+
+  public function create(PageForm $form): Page
+  {
+      $page = Page::create($form->signature_id, $form->title);
+      return $page;
+  }
+  ```
+
+2. **Использование оператора use для импорта классов** - Обязательно
+  ```php
+  use core\entities\Page\Page;
+  use core\repositories\page\PageRepository;
+  use core\forms\Page\PageForm;
+  use core\services\TransactionManager;
+  use core\services\language\LanguageService;
+
+  // Хорошо: использование сокращенных имен
+  public function __construct(
+      PageRepository $pages,
+      SignatureRepository $signatures,
+      TransactionManager $transaction,
+      LanguageService $language
+  ) {
+      $this->pages = $pages;
+      $this->signatures = $signatures;
+      $this->transaction = $transaction;
+      $this->language = $language;
+  }
+  ```
+
+3. **Внедрение зависимостей через конструктор** - Обязательно
+  ```php
+  // Хорошо: внедрение зависимостей через конструктор
+  public function __construct(
+      PageRepository $pages,
+      SignatureRepository $signatures,
+      TransactionManager $transaction,
+      LanguageService $language
+  ) {
+      $this->pages = $pages;
+      $this->signatures = $signatures;
+      $this->transaction = $transaction;
+      $this->language = $language;
+  }
+  ```
+
+4. **Инкапсуляция** - Свойства класса должны быть protected или private
+  ```php
+  // Хорошо: защищенное свойство
+  protected $transaction;
+
+  // Хорошо: аннотация для свойства
+  /** @var PageRepository */
+  protected $pages;
+  ```
+
+5. **Использование внедренных зависимостей вместо глобального доступа компонентам приложения** - Обязательно
+  ```php
+  // Хорошо: использование внедренной зависимости
+  $this->transaction->wrap(function () use ($form, $page) {
+      $this->pages->save($page);
+  });
+  ```
+
+6. **Использование хелперов через статические вызовы** - Обязательно
+  ```php
+  // Хорошо: вызов статических методов напрямую
+  CodeHelper::extractNamespace($content);
+  ```
+
+7. **Четкое и понятное именование методов** - Обязательно
+  ```php
+  // Хорошо: четкое и понятное имя
+  public function processCode($withCode)
+  ```
+
+8. **Комментарии только там, где они действительно необходимы** - Рекомендуется
+  ```php
+  /**
+   * @return Page[] — это исключение, потому что невозможно указать тип элементов массива в PHP 7.3
+   */
+  public function findAll(): array
+  ```
+
+9. **Аннотации PHPDoc с короткими именами классов** - Обязательно
+  ```php
+  // Хорошо: использование коротких имен классов в аннотациях
+  /** @var PageRepository */
+  protected $pages;
+  ```
+
